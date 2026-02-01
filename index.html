@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SVG Drawing App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f4f4;
+      gap: 10px;
+    }
+
+    svg {
+      border: 2px solid#333;
+      background: white;
+      cursor: crosshair;
+    }
+
+    button {
+      padding: 8px 12px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #ff4d4d;
+      color: white;
+    }
+
+    button:hover {
+      background: #e63939;
+    }
+  </style>
+</head>
+<body>
+
+<button id="clearBtn" title="Clear Drawing">🗑️</button>
+
+<svg id="drawingArea" width="600" height="400"></svg>
+
+<script>
+  const svg = document.getElementById("drawingArea");
+  const clearBtn = document.getElementById("clearBtn");
+
+  let isDrawing = false;
+  let polyline = null;
+
+  // Get mouse position relative to SVG
+  function getMousePosition(event) {
+    const rect = svg.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
+  // Start drawing
+  svg.addEventListener("mousedown", (e) => {
+    isDrawing = true;
+
+    const { x, y } = getMousePosition(e);
+
+    polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", `${x},${y}`);
+    polyline.setAttribute("stroke", "black");
+    polyline.setAttribute("stroke-width", "2");
+    polyline.setAttribute("fill", "none");
+
+    svg.appendChild(polyline);
+  });
+
+  // Draw while moving
+  svg.addEventListener("mousemove", (e) => {
+    if (!isDrawing) return;
+
+    const { x, y } = getMousePosition(e);
+    const points = polyline.getAttribute("points");
+    polyline.setAttribute("points", points + ` ${x},${y}`);
+  });
+
+  // Stop drawing
+  svg.addEventListener("mouseup", () => {
+    isDrawing = false;
+  });
+
+  svg.addEventListener("mouseleave", () => {
+    isDrawing = false;
+  });
+
+  // 🗑️ Clear drawing board
+  clearBtn.addEventListener("click", () => {
+    svg.innerHTML = "";
+  });
+</script>
+
+</body>
+</html>
